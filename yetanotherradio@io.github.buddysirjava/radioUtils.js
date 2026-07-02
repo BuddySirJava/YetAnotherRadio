@@ -24,25 +24,11 @@ export function getDefaultRecordingsDir() {
 }
 
 export function getCustomRecordingsDir(settings = null) {
-    if (!settings)
-        return '';
-
-    try {
-        return settings.get_string('recordings-directory')?.trim() || '';
-    } catch (error) {
-        return '';
-    }
+    return settings?.get_string('recordings-directory')?.trim() || '';
 }
 
 export function connectRecordingsDirChanged(settings, callback) {
-    if (!settings)
-        return 0;
-
-    try {
-        return settings.connect('changed::recordings-directory', callback);
-    } catch (error) {
-        return 0;
-    }
+    return settings?.connect('changed::recordings-directory', callback) ?? 0;
 }
 
 export function getRecordingsDir(settings = null) {

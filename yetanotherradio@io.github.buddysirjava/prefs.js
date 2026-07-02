@@ -688,16 +688,12 @@ const AddStationsPage = GObject.registerClass(
                 return;
             }
 
-            try {
-                this._stations.push(entry);
-                this._stations = saveStations(this._stations);
-                this._manualNameRow.text = '';
-                this._manualUrlRow.text = '';
-                if (this._refreshCallback) {
-                    this._refreshCallback(this._stations);
-                }
-            } catch (error) {
-                logError(error, 'Failed to save manual station');
+            this._stations.push(entry);
+            this._stations = saveStations(this._stations);
+            this._manualNameRow.text = '';
+            this._manualUrlRow.text = '';
+            if (this._refreshCallback) {
+                this._refreshCallback(this._stations);
             }
         }
     });
@@ -722,11 +718,7 @@ const RecordingsPage = GObject.registerClass(
             this.add(this._group);
 
             connectRecordingsDirChanged(this._settings, () => {
-                try {
-                    this.refresh();
-                } catch (error) {
-                    logError(error, 'Failed to refresh recordings page');
-                }
+                this.refresh();
             });
 
             const refreshIfVisible = () => {
@@ -752,11 +744,7 @@ const RecordingsPage = GObject.registerClass(
 
         _clearContentRows() {
             for (const row of this._contentRows) {
-                try {
-                    this._group.remove(row);
-                } catch (error) {
-                    logError(error, 'Failed to remove recordings row');
-                }
+                this._group.remove(row);
             }
             this._contentRows = [];
         }
@@ -1239,13 +1227,8 @@ const GeneralSettingsPage = GObject.registerClass(
                 if (!path)
                     return;
 
-                try {
-                    this._settings.set_string('recordings-directory', path);
-                    this._showToast(_('Recordings folder updated'));
-                } catch (error) {
-                    logError(error, 'Failed to save recordings folder setting');
-                    this._showToast(_('Could not save recordings folder setting'));
-                }
+                this._settings.set_string('recordings-directory', path);
+                this._showToast(_('Recordings folder updated'));
             });
 
             const window = this.get_root();
@@ -1256,13 +1239,8 @@ const GeneralSettingsPage = GObject.registerClass(
         }
 
         _resetRecordingsFolder() {
-            try {
-                this._settings.set_string('recordings-directory', '');
-                this._showToast(_('Using default recordings folder'));
-            } catch (error) {
-                logError(error, 'Failed to reset recordings folder setting');
-                this._showToast(_('Could not reset recordings folder setting'));
-            }
+            this._settings.set_string('recordings-directory', '');
+            this._showToast(_('Using default recordings folder'));
         }
 
         _showToast(title, timeout = 3) {
@@ -1276,46 +1254,41 @@ const GeneralSettingsPage = GObject.registerClass(
         }
 
         _exportStations() {
-            try {
-                const json = JSON.stringify(this._stations, null, 2);
-                const jsonBytes = new TextEncoder().encode(json);
-                const fileChooser = new Gtk.FileChooserNative({
-                    title: _('Export Stations'),
-                    action: Gtk.FileChooserAction.SAVE,
-                    accept_label: _('Save'),
-                });
+            const json = JSON.stringify(this._stations, null, 2);
+            const jsonBytes = new TextEncoder().encode(json);
+            const fileChooser = new Gtk.FileChooserNative({
+                title: _('Export Stations'),
+                action: Gtk.FileChooserAction.SAVE,
+                accept_label: _('Save'),
+            });
 
-                fileChooser.set_current_name('radio-stations.json');
-                fileChooser.connect('response', (dialog, response) => {
-                    if (response === Gtk.ResponseType.ACCEPT) {
-                        const file = fileChooser.get_file();
-                        if (file) {
-                            try {
-                                file.replace_contents(
-                                    jsonBytes,
-                                    null,
-                                    false,
-                                    Gio.FileCreateFlags.REPLACE_DESTINATION,
-                                    null
-                                );
-                                this._showToast(_('Stations exported successfully'));
-                            } catch (error) {
-                                logError(error, 'Export failed');
-                                this._showToast(_('Failed to export stations'));
-                            }
+            fileChooser.set_current_name('radio-stations.json');
+            fileChooser.connect('response', (dialog, response) => {
+                if (response === Gtk.ResponseType.ACCEPT) {
+                    const file = fileChooser.get_file();
+                    if (file) {
+                        try {
+                            file.replace_contents(
+                                jsonBytes,
+                                null,
+                                false,
+                                Gio.FileCreateFlags.REPLACE_DESTINATION,
+                                null
+                            );
+                            this._showToast(_('Stations exported successfully'));
+                        } catch (error) {
+                            logError(error, 'Export failed');
+                            this._showToast(_('Failed to export stations'));
                         }
                     }
-                });
-
-                const window = this.get_root();
-                if (window && window instanceof Gtk.Window) {
-                    fileChooser.set_transient_for(window);
                 }
-                fileChooser.show();
-            } catch (error) {
-                logError(error, 'Export failed');
-                this._showToast(_('Failed to export stations'));
+            });
+
+            const window = this.get_root();
+            if (window && window instanceof Gtk.Window) {
+                fileChooser.set_transient_for(window);
             }
+            fileChooser.show();
         }
 
         _importStations() {
