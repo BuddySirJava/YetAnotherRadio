@@ -244,7 +244,6 @@ export function createMetadataItem(playPauseCallback, stopCallback, recordCallba
     item._recordBtn = recordBtn;
     item._recordBlinkId = 0;
 
-    // Defensive teardown: stop blink regardless of recording event flow.
     item.connect('destroy', () => {
         _stopRecordBlink(item);
     });
