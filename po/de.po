@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: Yet Another Radio\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-06-25 23:41+0330\n"
-"PO-Revision-Date: 2026-06-16 19:03+0200\n"
+"PO-Revision-Date: 2026-07-04 15:50+0200\n"
 "Last-Translator: Uwe Senkler\n"
 "Language-Team: \n"
 "Language: de\n"
@@ -40,7 +40,7 @@ msgstr "In den Einstellungen können Sender hinzugefügt werden."
 
 #: yetanotherradio@io.github.buddysirjava/extension.js:324
 msgid "Could not open preferences."
-msgstr ""
+msgstr "Einstellungen konnten nicht geöffnet werden."
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:37
 msgid "Saved Stations"
@@ -178,42 +178,46 @@ msgstr "Kein Sender gefunden."
 #: yetanotherradio@io.github.buddysirjava/prefs.js:709
 #: yetanotherradio@io.github.buddysirjava/prefs.js:1125
 msgid "Recordings"
-msgstr ""
+msgstr "Aufnahmen"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:719
 msgid "Recorded sessions"
-msgstr ""
+msgstr "Aufgenommene Sitzungen"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:720
 msgid ""
 "You can access radio recordings from here. Expand each session to see their "
 "tracks."
 msgstr ""
+"Von hier aus können Sie auf Radioaufnahmen zugreifen. Nach dem Erweitern "
+"einer Sitzung werden die einzelnen Stücke angezeigt."
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:772
 msgid "No recordings yet."
-msgstr ""
+msgstr "Noch keine Aufnahmen vorhanden."
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:773
 msgid "Use the record button in the panel menu while playing a station."
 msgstr ""
+"Drücken Sie während der Wiedergabe eines Senders den Aufnahmeknopf im "
+"Leistenmenü."
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:795
 #, javascript-format
 msgid "%s • %s • %d track(s)"
-msgstr ""
+msgstr "%s • %s • %d Stück(e))"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:802
 msgid "Unknown station"
-msgstr ""
+msgstr "Unbekannter Sender"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:818
 msgid "Save or export session"
-msgstr ""
+msgstr "Sitzung speichern oder exportieren"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:827
 msgid "Delete session"
-msgstr ""
+msgstr "Sitzung löschen"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:837
 #: yetanotherradio@io.github.buddysirjava/modules/metadataDisplay.js:430
@@ -226,68 +230,68 @@ msgstr "Titel nicht bekannt"
 #: yetanotherradio@io.github.buddysirjava/prefs.js:932
 #: yetanotherradio@io.github.buddysirjava/prefs.js:1020
 msgid "Save track"
-msgstr ""
+msgstr "Stück speichern"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:864
 msgid "Delete recording session?"
-msgstr ""
+msgstr "Aufgenommene Sitzung löschen?"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:865
 msgid "This will permanently delete all tracks in this session."
-msgstr ""
+msgstr "Es werden alle Stücke in der Sitzung unwiederbringlich gelöscht."
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:871
 msgid "Delete"
-msgstr ""
+msgstr "Löschen"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:880
 msgid "Recording session deleted"
-msgstr ""
+msgstr "Aufnahmesitzung gelöscht"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:884
 msgid "Failed to delete recording session"
-msgstr ""
+msgstr "Löschen der Aufnahmesitzung fehlgeschlagen"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:926
 msgid "No track files found for this session"
-msgstr ""
+msgstr "Keine Stückdateien in dieser Sitzung gefunden"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:953
 msgid "Session saved successfully"
-msgstr ""
+msgstr "Sitzung erfolgreich gespeichert"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:956
 msgid "Failed to save session"
-msgstr ""
+msgstr "Speichern der Sitzung fehlgeschlagen"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:969
 msgid "Export session tracks"
-msgstr ""
+msgstr "Stücke der Sitzung exportieren"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:971
 #: yetanotherradio@io.github.buddysirjava/prefs.js:1219
 msgid "Select"
-msgstr ""
+msgstr "Wählen"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:996
 msgid "Session exported successfully"
-msgstr ""
+msgstr "Sitzung erfolgreich exportiert"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:999
 msgid "Failed to export session"
-msgstr ""
+msgstr "Export der Sitzung fehlgeschlagen"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:1013
 msgid "Track file is missing"
-msgstr ""
+msgstr "Stückdatei fehlt"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:1042
 msgid "Track saved successfully"
-msgstr ""
+msgstr "Stück erfolgreich gespeichert"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:1045
 msgid "Failed to save track"
-msgstr ""
+msgstr "Speichern des Stücks fehlgeschlagen"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:1061
 msgid "General"
@@ -326,7 +330,7 @@ msgstr "MPRIS-Integration"
 #: yetanotherradio@io.github.buddysirjava/prefs.js:1110
 msgid "Expose the player over D-Bus so media keys and system controls work"
 msgstr ""
-"Wiedergabesteuerung über D-Bus  freigeben, so dass  Medientasten und "
+"Wiedergabesteuerung über D-Bus freigeben, so dass Medientasten und "
 "Systemsteuerungsfunktionen verwendet werden können"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:1126
@@ -334,18 +338,20 @@ msgid ""
 "Choose where audio tracks are saved. Session metadata is stored separately "
 "in the app data folder."
 msgstr ""
+"Wählen, wo Audiodateien gespeichert werden. Sitzungs-Metadaten werden "
+"separat im Datenordner der Erweiterung gespeichert."
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:1131
 msgid "Recordings folder"
-msgstr ""
+msgstr "Aufnahmeordner"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:1144
 msgid "Choose folder"
-msgstr ""
+msgstr "Ordner wählen"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:1152
 msgid "Use default folder"
-msgstr ""
+msgstr "Standardordner verwenden"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:1166
 msgid "Import / Export"
@@ -377,27 +383,27 @@ msgstr "Sender aus einer Sicherungskopie importieren"
 #: yetanotherradio@io.github.buddysirjava/prefs.js:1210
 #, javascript-format
 msgid "Default: %s"
-msgstr ""
+msgstr "Standard: %s"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:1217
 msgid "Choose recordings folder"
-msgstr ""
+msgstr "Aufnahmeordner wählen"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:1240
 msgid "Recordings folder updated"
-msgstr ""
+msgstr "Aufnahmeordner aktualisiert"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:1243
 msgid "Could not save recordings folder setting"
-msgstr ""
+msgstr "Einstellung des Aufnahmeordners konnte nicht gespeichert werden"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:1257
 msgid "Using default recordings folder"
-msgstr ""
+msgstr "Standardaufnahmeordner wird verwendet"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:1260
 msgid "Could not reset recordings folder setting"
-msgstr ""
+msgstr "Aufnahmeordnereinstellung konnte nicht zurückgesetzt werden"
 
 #: yetanotherradio@io.github.buddysirjava/prefs.js:1297
 msgid "Stations exported successfully"
@@ -454,16 +460,17 @@ msgstr "Sender ohne Namen"
 
 #: yetanotherradio@io.github.buddysirjava/radioUtils.js:223
 msgid "Could not create recordings directory. Check file permissions."
-msgstr ""
+msgstr "Aufnahmeordner konnte nicht angelegt werden. Zugriffsrechte prüfen."
 
 #: yetanotherradio@io.github.buddysirjava/radioUtils.js:238
 msgid "Could not create recording sessions index. Check file permissions."
 msgstr ""
+"Aufnahmesitzungsindex konnte nicht angelegt werden. Zugriffsrechte prüfen."
 
 #: yetanotherradio@io.github.buddysirjava/radioUtils.js:492
 #, javascript-format
 msgid "Failed to save recording sessions: %s"
-msgstr ""
+msgstr "Speichern von Aufnahmesitzungen fehlgeschlagen: %s"
 
 #: yetanotherradio@io.github.buddysirjava/radioUtils.js:670
 #: yetanotherradio@io.github.buddysirjava/radioUtils.js:718
@@ -512,23 +519,23 @@ msgstr "Künstler nicht bekannt"
 
 #: yetanotherradio@io.github.buddysirjava/modules/playbackManager.js:139
 msgid "GStreamer audio sink plugins missing"
-msgstr ""
+msgstr "Audio-Sink-Erweiterungen von GStreamer fehlen"
 
 #: yetanotherradio@io.github.buddysirjava/modules/playbackManager.js:152
 msgid "Failed to link playback branch"
-msgstr ""
+msgstr "Verknüpfung zum Wiedergabezweig fehlgeschlagen"
 
 #: yetanotherradio@io.github.buddysirjava/modules/playbackManager.js:180
 msgid "GStreamer recording plugins missing"
-msgstr ""
+msgstr "Aufnahme-Erweiterungen von GStreamer fehlen"
 
 #: yetanotherradio@io.github.buddysirjava/modules/playbackManager.js:203
 msgid "Failed to link recording branch"
-msgstr ""
+msgstr "Verknüpfung zum Aufnahmezweig fehlgeschlagen"
 
 #: yetanotherradio@io.github.buddysirjava/modules/playbackManager.js:282
 msgid "Recording branch unavailable"
-msgstr ""
+msgstr "Aufnahmezweig nicht verfügbar"
 
 #: yetanotherradio@io.github.buddysirjava/modules/playbackManager.js:373
 msgid "Could not play the selected station."
@@ -546,28 +553,28 @@ msgstr "Wiedergabe von %s"
 
 #: yetanotherradio@io.github.buddysirjava/modules/recordingManager.js:72
 msgid "Start playing a station before recording."
-msgstr ""
+msgstr "Vor Aufnahmestart Senderwiedergabe starten."
 
 #: yetanotherradio@io.github.buddysirjava/modules/recordingManager.js:84
 #: yetanotherradio@io.github.buddysirjava/modules/recordingManager.js:128
 msgid "Recording error"
-msgstr ""
+msgstr "Aufnahmefehler"
 
 #: yetanotherradio@io.github.buddysirjava/modules/recordingManager.js:84
 msgid "Playback is not ready for recording."
-msgstr ""
+msgstr "Keine Wiedergabe zur Aufnahme vorhanden."
 
 #: yetanotherradio@io.github.buddysirjava/modules/recordingManager.js:117
 msgid "Failed to start recording branch"
-msgstr ""
+msgstr "Start des Aufnahmezweigs fehlgeschlagen"
 
 #: yetanotherradio@io.github.buddysirjava/modules/recordingManager.js:279
 msgid "Failed to rotate recording track"
-msgstr ""
+msgstr "Wechsel von Aufnahmestück fehlgeschlagen"
 
 #: yetanotherradio@io.github.buddysirjava/modules/recordingManager.js:284
 msgid "Failed to set recording output path"
-msgstr ""
+msgstr "Festlegen des Aufnahmeausgabepfads fehlgeschlagen"
 
 #: yetanotherradio@io.github.buddysirjava/schemas/org.gnome.shell.extensions.yetanotherradio.gschema.xml:6
 msgid "Metadata update interval"
@@ -632,13 +639,15 @@ msgstr "Wiedergabelautstärke (0–100)"
 
 #: yetanotherradio@io.github.buddysirjava/schemas/org.gnome.shell.extensions.yetanotherradio.gschema.xml:51
 msgid "Recordings directory"
-msgstr ""
+msgstr "Aufnahmeordner"
 
 #: yetanotherradio@io.github.buddysirjava/schemas/org.gnome.shell.extensions.yetanotherradio.gschema.xml:52
 msgid ""
 "Folder where radio recordings and session data are stored. Leave empty to "
 "use the default location."
 msgstr ""
+"Ordner, in dem Radioaufnahmen und Sitzungsdaten gespeichert werden. Wenn "
+"leer, wird der Standardort verwendet."
 
 #~ msgid "Enable Media Keys"
 #~ msgstr "Medientasten aktivieen"
