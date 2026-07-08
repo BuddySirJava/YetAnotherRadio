@@ -9,7 +9,7 @@ const SCROLL_GAP = '     ';
 const HOVER_LEAVE_DELAY_MS = 120;
 
 function _setClutterText(label, props) {
-    const t = label?.clutter_text;
+    const t = label.clutter_text;
     if (!t)
         return;
 
@@ -57,7 +57,7 @@ export function createScrollGroup() {
         onEnter(active) {
             for (const member of members) {
                 if (member !== active)
-                    member.stopFromGroup?.();
+                    member.stopFromGroup();
             }
         },
     };
@@ -77,7 +77,6 @@ export function createHoverScrollingLabel(params = {}) {
     let _overflows = false;
     let _scrolling = false;
     let _hovered = false;
-    let _destroyed = false;
     let _leaveTimeoutId = 0;
     let _overflowIdleId = 0;
     let _scrollIdleId = 0;
@@ -139,9 +138,6 @@ export function createHoverScrollingLabel(params = {}) {
     }
 
     function _computeOverflow() {
-        if (_destroyed)
-            return false;
-
         _overflowIdleId = 0;
 
         if (!_text) {
@@ -149,8 +145,8 @@ export function createHoverScrollingLabel(params = {}) {
             return false;
         }
 
-        const layout = label.clutter_text?.get_layout();
-        if (layout?.is_ellipsized?.()) {
+        const layout = label.clutter_text.get_layout();
+        if (layout.is_ellipsized()) {
             _overflows = true;
             return true;
         }
@@ -174,9 +170,6 @@ export function createHoverScrollingLabel(params = {}) {
             GLib.Source.remove(_overflowIdleId);
 
         _overflowIdleId = GLib.idle_add(GLib.PRIORITY_LOW, () => {
-            if (_destroyed)
-                return GLib.SOURCE_REMOVE;
-
             _overflowIdleId = 0;
             if (!_computeOverflow() && _clipWidth() <= 0)
                 _scheduleOverflowCheck();
@@ -185,7 +178,7 @@ export function createHoverScrollingLabel(params = {}) {
     }
 
     function _removeScrollTransition() {
-        const adjustment = scrollView.get_hadjustment?.() ?? null;
+        const adjustment = scrollView.get_hadjustment();
         if (!adjustment) {
             _transition = null;
             _adjustmentChangedId = 0;
@@ -212,15 +205,12 @@ export function createHoverScrollingLabel(params = {}) {
         _removeScrollTransition();
         _scrolling = false;
 
-        if (_destroyed)
-            return;
-
         label.text = _text;
         _configureIdle(label, { multiline, maxLines });
     }
 
     function _beginScrollAnimation(adjustment, segmentWidth) {
-        if (_destroyed || !_hovered || _transition)
+        if (!_hovered || _transition)
             return;
 
         const pageSize = adjustment.page_size ?? adjustment.pageSize;
@@ -270,7 +260,7 @@ export function createHoverScrollingLabel(params = {}) {
     }
 
     function _startScrolling() {
-        if (_destroyed || _scrolling || !_text || !_overflows || !_hovered)
+        if (_scrolling || !_text || !_overflows || !_hovered)
             return;
 
         const clipWidth = _clipWidth();
@@ -292,7 +282,7 @@ export function createHoverScrollingLabel(params = {}) {
 
         _scrolling = true;
 
-        const adjustment = scrollView.get_hadjustment?.() ?? null;
+        const adjustment = scrollView.get_hadjustment();
         if (!adjustment) {
             _scrolling = false;
             return;
@@ -303,14 +293,14 @@ export function createHoverScrollingLabel(params = {}) {
         label.text = `${segmentText}${_text}`;
 
         _adjustmentChangedId = adjustment.connect('changed', () => {
-            if (_destroyed || !_scrolling || _transition)
+            if (!_scrolling || _transition)
                 return;
 
             _tryBeginScrollAnimation(adjustment, segmentWidth);
         });
 
         GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
-            if (_destroyed || !_scrolling || _transition)
+            if (!_scrolling || _transition)
                 return GLib.SOURCE_REMOVE;
 
             _tryBeginScrollAnimation(adjustment, segmentWidth);
@@ -324,7 +314,7 @@ export function createHoverScrollingLabel(params = {}) {
 
         _scrollIdleId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
             _scrollIdleId = 0;
-            if (_destroyed || !_hovered || _scrolling)
+            if (!_hovered || _scrolling)
                 return GLib.SOURCE_REMOVE;
 
             if (!_computeOverflow() && _clipWidth() <= 0) {
@@ -340,9 +330,6 @@ export function createHoverScrollingLabel(params = {}) {
     }
 
     function _onHoverChanged() {
-        if (_destroyed)
-            return;
-
         if (scrollView.hover) {
             if (_leaveTimeoutId) {
                 GLib.Source.remove(_leaveTimeoutId);
@@ -350,7 +337,8 @@ export function createHoverScrollingLabel(params = {}) {
             }
 
             _hovered = true;
-            scrollGroup?.onEnter(groupMember);
+            if (scrollGroup)
+                scrollGroup.onEnter(groupMember);
 
             if (!_scrolling)
                 _scheduleStart();
@@ -364,7 +352,7 @@ export function createHoverScrollingLabel(params = {}) {
 
         _leaveTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, HOVER_LEAVE_DELAY_MS, () => {
             _leaveTimeoutId = 0;
-            if (_destroyed || _hovered || scrollView.hover)
+            if (_hovered || scrollView.hover)
                 return GLib.SOURCE_REMOVE;
 
             _stopScrolling();
@@ -382,9 +370,6 @@ export function createHoverScrollingLabel(params = {}) {
     };
 
     function setText(text) {
-        if (_destroyed)
-            return;
-
         const newText = String(text ?? '');
         if (newText === _text)
             return;
@@ -403,26 +388,22 @@ export function createHoverScrollingLabel(params = {}) {
     }
 
     function setOpacity(opacity) {
-        if (!_destroyed)
-            label.opacity = opacity;
+        label.opacity = opacity;
     }
 
     function destroy() {
-        if (_destroyed)
-            return;
-
-        _destroyed = true;
-
-        if (_leaveTimeoutId)
+        if (_leaveTimeoutId) {
             GLib.Source.remove(_leaveTimeoutId);
-        if (_overflowIdleId)
+            _leaveTimeoutId = 0;
+        }
+        if (_overflowIdleId) {
             GLib.Source.remove(_overflowIdleId);
-        if (_scrollIdleId)
+            _overflowIdleId = 0;
+        }
+        if (_scrollIdleId) {
             GLib.Source.remove(_scrollIdleId);
-
-        _leaveTimeoutId = 0;
-        _overflowIdleId = 0;
-        _scrollIdleId = 0;
+            _scrollIdleId = 0;
+        }
 
         _removeScrollTransition();
         _scrolling = false;

@@ -184,7 +184,7 @@ export function createMetadataItem(playPauseCallback, stopCallback, recordCallba
             style_class: 'metadata-overlay-icon'
         })
     });
-    playPauseBtn.connect('clicked', () => playPauseCallback?.());
+    playPauseBtn.connect('clicked', () => playPauseCallback());
     playbackControlsBox.add_child(playPauseBtn);
 
     const stopBtn = new St.Button({
@@ -194,7 +194,7 @@ export function createMetadataItem(playPauseCallback, stopCallback, recordCallba
             style_class: 'metadata-overlay-icon'
         })
     });
-    stopBtn.connect('clicked', () => stopCallback?.());
+    stopBtn.connect('clicked', () => stopCallback());
     playbackControlsBox.add_child(stopBtn);
 
     const recordControlsBox = new St.BoxLayout({
@@ -214,7 +214,7 @@ export function createMetadataItem(playPauseCallback, stopCallback, recordCallba
             style_class: 'metadata-overlay-icon'
         })
     });
-    recordBtn.connect('clicked', () => recordCallback?.());
+    recordBtn.connect('clicked', () => recordCallback());
     recordControlsBox.add_child(recordBtn);
 
     controlsBox.add_child(playbackControlsBox);
@@ -244,15 +244,19 @@ export function createMetadataItem(playPauseCallback, stopCallback, recordCallba
     item._recordBtn = recordBtn;
     item._recordBlinkId = 0;
 
-    item.connect('destroy', () => {
+    item.destroy = () => {
         _stopRecordBlink(item);
-    });
+        if (item._titleScroll)
+            item._titleScroll.destroy();
+        if (item._artistScroll)
+            item._artistScroll.destroy();
+    };
 
     return item;
 }
 
 export function updateCopyButton(metadataItem, currentMetadata) {
-    if (!metadataItem?._copyTrackBtn)
+    if (!metadataItem || !metadataItem._copyTrackBtn)
         return;
 
     const track = _buildTrackText(currentMetadata);
@@ -281,9 +285,7 @@ function _stopRecordBlink(item) {
         item._recordBlinkId = 0;
     }
 
-    const icon = item._recordBtn?.child;
-    if (icon)
-        icon.opacity = 255;
+    item._recordBtn.child.opacity = 255;
 }
 
 function _startRecordBlink(item) {
@@ -300,7 +302,7 @@ function _startRecordBlink(item) {
 }
 
 export function updateRecordingState(item, isRecording) {
-    if (!item?._recordBtn)
+    if (!item || !item._recordBtn)
         return;
 
     if (isRecording) {

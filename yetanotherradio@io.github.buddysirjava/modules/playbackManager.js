@@ -93,7 +93,6 @@ export default class PlaybackManager {
             return;
 
         this._player.set_state(Gst.State.NULL);
-        this._player.get_state(2 * Gst.SECOND);
     }
 
     get currentMetadata() {
@@ -277,18 +276,17 @@ export default class PlaybackManager {
         this._recordRotateTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
             this._recordRotateTimeoutId = null;
 
-            try {
-                if (!this._recordFilesink)
-                    throw new Error(_('Recording branch unavailable'));
-
-                this._recordFilesink.set_state(Gst.State.NULL);
-                this._recordFilesink.set_property('location', path);
-                this._recordFilesink.sync_state_with_parent();
-                callback?.(null);
-            } catch (error) {
-                logError(error, 'Failed to rotate recording output');
-                callback?.(error);
+            if (!this._recordFilesink) {
+                if (callback)
+                    callback(new Error(_('Recording branch unavailable')));
+                return GLib.SOURCE_REMOVE;
             }
+
+            this._recordFilesink.set_state(Gst.State.NULL);
+            this._recordFilesink.set_property('location', path);
+            this._recordFilesink.sync_state_with_parent();
+            if (callback)
+                callback(null);
 
             return GLib.SOURCE_REMOVE;
         });

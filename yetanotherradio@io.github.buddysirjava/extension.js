@@ -50,33 +50,28 @@ const Indicator = GObject.registerClass(
 
             // Middle click: pause/resume current playback, or resume last station when stopped.
             this.connect('captured-event', (_actor, event) => {
-                try {
-                    const type = event?.type?.();
-                    const isButtonEvent = type === Clutter.EventType.BUTTON_PRESS || type === Clutter.EventType.BUTTON_RELEASE;
-                    if (!isButtonEvent || event?.get_button?.() !== 2)
-                        return Clutter.EVENT_PROPAGATE;
-
-                    // Block PanelMenu's default middle-click handling.
-                    if (type === Clutter.EventType.BUTTON_PRESS)
-                        return Clutter.EVENT_STOP;
-
-                    const state = this._playbackManager?.playbackState;
-                    if (state === 'playing' || state === 'paused') {
-                        this._togglePlayback();
-                    } else {
-                        const station = this._getLastPlayedStation();
-                        if (station)
-                            this._playStation(station);
-                        else
-                            Main.notify(_('Yet Another Radio'), _('No station played yet.'));
-                    }
-
-                    this.menu?.close?.();
-                    return Clutter.EVENT_STOP;
-                } catch (e) {
-                    console.debug('Middle click handler failed:', e);
+                const type = event.type();
+                const isButtonEvent = type === Clutter.EventType.BUTTON_PRESS || type === Clutter.EventType.BUTTON_RELEASE;
+                if (!isButtonEvent || event.get_button() !== 2)
                     return Clutter.EVENT_PROPAGATE;
+
+                // Block PanelMenu's default middle-click handling.
+                if (type === Clutter.EventType.BUTTON_PRESS)
+                    return Clutter.EVENT_STOP;
+
+                const state = this._playbackManager.playbackState;
+                if (state === 'playing' || state === 'paused') {
+                    this._togglePlayback();
+                } else {
+                    const station = this._getLastPlayedStation();
+                    if (station)
+                        this._playStation(station);
+                    else
+                        Main.notify(_('Yet Another Radio'), _('No station played yet.'));
                 }
+
+                this.menu.close();
+                return Clutter.EVENT_STOP;
             });
 
             this._metadataItem = createMetadataItem(
@@ -87,9 +82,10 @@ const Indicator = GObject.registerClass(
             this._metadataItem.visible = false;
             this.menu.addMenuItem(this._metadataItem);
 
-            this._recordingManager.addListener('onRecordingChanged', (active) => {
+            this._onRecordingChanged = (active) => {
                 updateRecordingState(this._metadataItem, active);
-            });
+            };
+            this._recordingManager.addListener('onRecordingChanged', this._onRecordingChanged);
 
             this._volumeItem = createVolumeItem(this._settings);
             this._volumeItem._volumeSlider.connect('notify::value', () => this._onVolumeChanged());
@@ -123,7 +119,7 @@ const Indicator = GObject.registerClass(
             this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
             this._prefsItem = new PopupMenu.PopupMenuItem(_('Open preferences'));
-            this._prefsItem.connect('activate', () => this._openPrefs?.());
+            this._prefsItem.connect('activate', () => this._openPrefs());
             this.menu.addMenuItem(this._prefsItem);
 
             this._hintItem = new PopupMenu.PopupMenuItem(_('Use preferences to add stations.'));
@@ -192,7 +188,7 @@ const Indicator = GObject.registerClass(
         setStations(stations) {
             this._stations = stations ?? [];
             this._refreshStationsMenu();
-            this._onStationsChanged?.(this._stations.length);
+            this._onStationsChanged(this._stations.length);
         }
 
         _refreshStationsMenu() {
@@ -286,6 +282,11 @@ const Indicator = GObject.registerClass(
         }
 
         destroy() {
+            this._recordingManager.removeListener('onRecordingChanged', this._onRecordingChanged);
+
+            if (this._metadataItem)
+                this._metadataItem.destroy();
+
             this._recordingManager.destroy();
             this._playbackManager.destroy();
 
@@ -327,7 +328,10 @@ export default class YetAnotherRadioExtension extends Extension {
             },
             this.path,
             this._settings,
-            (count) => this._mpris?.setStationCount(count)
+            (count) => {
+                if (this._mpris)
+                    this._mpris.setStationCount(count);
+            }
         );
 
         if (this._settings.get_boolean('enable-mpris')) {

@@ -24,11 +24,11 @@ export function getDefaultRecordingsDir() {
 }
 
 export function getCustomRecordingsDir(settings = null) {
-    return settings?.get_string('recordings-directory')?.trim() || '';
+    return settings?.get_string('recordings-directory')?.trim();
 }
 
 export function connectRecordingsDirChanged(settings, callback) {
-    return settings?.connect('changed::recordings-directory', callback) ?? 0;
+    return settings?.connect('changed::recordings-directory', callback);
 }
 
 export function getRecordingsDir(settings = null) {

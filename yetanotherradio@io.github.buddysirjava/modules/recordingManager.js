@@ -80,7 +80,7 @@ export default class RecordingManager {
         if (this._recording)
             return true;
 
-        if (!this._playbackManager?.setRecordingOutputPath) {
+        if (!this._playbackManager.setRecordingOutputPath) {
             Main.notifyError(_('Recording error'), _('Playback is not ready for recording.'));
             return false;
         }
@@ -121,7 +121,7 @@ export default class RecordingManager {
             return true;
         } catch (error) {
             logError(error, 'Failed to start recording');
-            this._playbackManager?.stopRecordingBranch?.();
+            this._playbackManager.stopRecordingBranch();
             this._session = null;
             this._recording = false;
             this._emit('onRecordingChanged', false);
@@ -137,7 +137,7 @@ export default class RecordingManager {
         const sessionToSave = this._session;
 
         this._finalizeCurrentTrack();
-        this._playbackManager?.stopRecordingBranch?.();
+        this._playbackManager.stopRecordingBranch();
 
         if (sessionToSave) {
             sessionToSave.endedAt = Date.now();
@@ -177,9 +177,9 @@ export default class RecordingManager {
         }
 
         if (state === 'paused')
-            this._playbackManager?.setRecordingActive?.(false);
+            this._playbackManager.setRecordingActive(false);
         else if (state === 'playing' && !this._trackRotatePending)
-            this._playbackManager?.setRecordingActive?.(true);
+            this._playbackManager.setRecordingActive(true);
     }
 
     onStationChanged(station) {
