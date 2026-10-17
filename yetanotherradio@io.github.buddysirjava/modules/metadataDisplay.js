@@ -11,6 +11,10 @@ import { formatDuration } from '../radioUtils.js';
 
 const METADATA_ICON_SIZE = 64;
 const COMBINED_TITLE_SEPARATORS = [' - ', ' – ', ' — '];
+const hasOrientation = 'orientation' in St.BoxLayout.prototype;
+const verticalOrientation = hasOrientation
+    ? { orientation: Clutter.Orientation.VERTICAL }
+    : { vertical: true };
 
 function _splitCombinedTrackTitle(title, artist) {
     const rawArtist = String(artist ?? '').trim();
@@ -64,7 +68,6 @@ function _copyToClipboard(text) {
 
 export function createMetadataItem(playPauseCallback, stopCallback, recordCallback) {
     const box = new St.BoxLayout({
-        vertical: false,
         style_class: 'metadata-item-box',
         y_align: Clutter.ActorAlign.CENTER
     });
@@ -78,7 +81,7 @@ export function createMetadataItem(playPauseCallback, stopCallback, recordCallba
     box.add_child(thumbnail);
 
     const textBox = new St.BoxLayout({
-        vertical: true,
+        ...verticalOrientation,
         style_class: 'metadata-text-box',
         reactive: false
     });
@@ -112,7 +115,6 @@ export function createMetadataItem(playPauseCallback, stopCallback, recordCallba
     copyTrackBtn.sensitive = false;
 
     const titleRow = new St.BoxLayout({
-        vertical: false,
         x_expand: true,
         y_align: Clutter.ActorAlign.CENTER
     });
@@ -142,7 +144,7 @@ export function createMetadataItem(playPauseCallback, stopCallback, recordCallba
     });
 
     const metaInfoBox = new St.BoxLayout({
-        vertical: true,
+        ...verticalOrientation,
         style_class: 'metadata-info-box',
         x_expand: false,
         y_align: Clutter.ActorAlign.CENTER
@@ -151,7 +153,6 @@ export function createMetadataItem(playPauseCallback, stopCallback, recordCallba
     metaInfoBox.add_child(qualityLabel);
 
     const bottomRow = new St.BoxLayout({
-        vertical: false,
         style_class: 'metadata-bottom-row',
         x_expand: true,
         y_align: Clutter.ActorAlign.CENTER
@@ -161,7 +162,6 @@ export function createMetadataItem(playPauseCallback, stopCallback, recordCallba
 
     const controlsBox = new St.BoxLayout({
         style_class: 'metadata-controls-box',
-        vertical: false,
         x_align: Clutter.ActorAlign.END,
         y_align: Clutter.ActorAlign.CENTER,
         x_expand: true,
@@ -169,7 +169,6 @@ export function createMetadataItem(playPauseCallback, stopCallback, recordCallba
 
     const playbackControlsBox = new St.BoxLayout({
         style_class: 'button metadata-controls-pill',
-        vertical: false,
         y_align: Clutter.ActorAlign.CENTER,
         reactive: true,
     });
@@ -199,7 +198,6 @@ export function createMetadataItem(playPauseCallback, stopCallback, recordCallba
 
     const recordControlsBox = new St.BoxLayout({
         style_class: 'button metadata-controls-pill',
-        vertical: false,
         y_align: Clutter.ActorAlign.CENTER,
         reactive: true,
     });
