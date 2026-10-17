@@ -7,6 +7,7 @@ import St from 'gi://St';
 const SCROLL_SPEED = 0.04;
 const SCROLL_GAP = '     ';
 const HOVER_LEAVE_DELAY_MS = 120;
+const HOVER_START_DELAY_MS = 300;
 
 function _setClutterText(label, props) {
     const t = label.clutter_text;
@@ -88,6 +89,8 @@ export function createHoverScrollingLabel(params = {}) {
         style_class: clipStyleClass,
         hscrollbar_policy: St.PolicyType.NEVER,
         vscrollbar_policy: St.PolicyType.NEVER,
+        enable_mouse_scrolling: false,
+        enable_touch_scrolling: false,
         clip_to_allocation: true,
         reactive: true,
         track_hover: true,
@@ -171,8 +174,7 @@ export function createHoverScrollingLabel(params = {}) {
 
         _overflowIdleId = GLib.idle_add(GLib.PRIORITY_LOW, () => {
             _overflowIdleId = 0;
-            if (!_computeOverflow() && _clipWidth() <= 0)
-                _scheduleOverflowCheck();
+            _computeOverflow();
             return GLib.SOURCE_REMOVE;
         });
     }
@@ -312,15 +314,12 @@ export function createHoverScrollingLabel(params = {}) {
         if (_scrollIdleId)
             GLib.Source.remove(_scrollIdleId);
 
-        _scrollIdleId = GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+        _scrollIdleId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, HOVER_START_DELAY_MS, () => {
             _scrollIdleId = 0;
-            if (!_hovered || _scrolling)
+            if (!_hovered || _scrolling || !scrollView.hover)
                 return GLib.SOURCE_REMOVE;
 
-            if (!_computeOverflow() && _clipWidth() <= 0) {
-                _scheduleStart();
-                return GLib.SOURCE_REMOVE;
-            }
+            _computeOverflow();
 
             if (_overflows)
                 _startScrolling();
@@ -346,6 +345,10 @@ export function createHoverScrollingLabel(params = {}) {
         }
 
         _hovered = false;
+        if (_scrollIdleId) {
+            GLib.Source.remove(_scrollIdleId);
+            _scrollIdleId = 0;
+        }
 
         if (_leaveTimeoutId)
             GLib.Source.remove(_leaveTimeoutId);
@@ -362,6 +365,10 @@ export function createHoverScrollingLabel(params = {}) {
 
     groupMember.stopFromGroup = () => {
         _hovered = false;
+        if (_scrollIdleId) {
+            GLib.Source.remove(_scrollIdleId);
+            _scrollIdleId = 0;
+        }
         if (_leaveTimeoutId) {
             GLib.Source.remove(_leaveTimeoutId);
             _leaveTimeoutId = 0;
