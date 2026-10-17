@@ -4,6 +4,7 @@ import Gdk from 'gi://Gdk';
 import GObject from 'gi://GObject';
 import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
+import Gst from 'gi://Gst';
 
 import { ExtensionPreferences, gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
@@ -287,9 +288,105 @@ const SavedStationsPage = GObject.registerClass(
 
     });
 
+class StationPreviewPlayer {
+    constructor(settings) {
+        this._settings = settings;
+        this._player = null;
+        this._busHandlerId = null;
+        this._currentUuid = null;
+        this._onStateChange = null;
+        this._onError = null;
+    }
+
+    _initGst() {
+        if (!Gst.is_initialized())
+            Gst.init(null);
+    }
+
+    play(station, onStateChange, onError) {
+        const uuid = station.stationuuid || station.uuid;
+        const uri = station.url_resolved || station.url;
+
+        if (this._currentUuid === uuid) {
+            this.stop();
+            return;
+        }
+
+        this.stop();
+
+        if (!uri) {
+            onError?.(_('No valid stream URL found for this station.'));
+            return;
+        }
+
+        this._initGst();
+
+        this._currentUuid = uuid;
+        this._onStateChange = onStateChange;
+        this._onError = onError;
+
+        if (!this._player) {
+            this._player = Gst.ElementFactory.make('playbin', 'station-preview-player');
+            if (!this._player) {
+                this.stop();
+                onError?.(_('GStreamer playbin plugin missing.'));
+                return;
+            }
+            const bus = this._player.get_bus();
+            bus.add_signal_watch();
+            this._busHandlerId = bus.connect('message', (_bus, message) => {
+                if (message.type === Gst.MessageType.ERROR) {
+                    const [err] = message.parse_error();
+                    console.debug('Preview player error:', err.message);
+                    const cb = this._onError;
+                    this.stop();
+                    cb?.(_('Could not play station preview: %s').format(err.message));
+                } else if (message.type === Gst.MessageType.EOS) {
+                    this.stop();
+                }
+            });
+        }
+
+        const volume = (this._settings?.get_int('volume') ?? 100) / 100.0;
+        this._player.set_property('volume', volume);
+        this._player.set_property('uri', uri);
+        this._player.set_state(Gst.State.PLAYING);
+
+        this._onStateChange?.(true);
+    }
+
+    stop() {
+        if (this._player) {
+            this._player.set_state(Gst.State.NULL);
+        }
+        if (this._onStateChange) {
+            this._onStateChange(false);
+            this._onStateChange = null;
+        }
+        this._onError = null;
+        this._currentUuid = null;
+    }
+
+    destroy() {
+        this.stop();
+        if (this._player) {
+            if (this._busHandlerId) {
+                const bus = this._player.get_bus();
+                bus.disconnect(this._busHandlerId);
+                this._busHandlerId = null;
+            }
+            this._player = null;
+        }
+    }
+
+    get currentUuid() {
+        return this._currentUuid;
+    }
+}
+
 const AddStationsPage = GObject.registerClass(
     class AddStationsPage extends Adw.PreferencesPage {
-        _init(stations, refreshCallback, settings) {
+        _init(stations, refreshCallback, settings, window = null) {
             super._init({
                 title: _('Add Stations'),
                 icon_name: 'list-add-symbolic',
@@ -299,6 +396,9 @@ const AddStationsPage = GObject.registerClass(
             this._settings = settings;
             this._stations = stations;
             this._refreshCallback = refreshCallback;
+            this._window = window;
+            this._previewPlayer = new StationPreviewPlayer(settings);
+            this._activePreviewButton = null;
             this._searching = false;
             this._searchDebounceTimer = null;
             this._idleSourceId = null;
@@ -404,6 +504,11 @@ const AddStationsPage = GObject.registerClass(
                 this._client.destroy();
                 this._client = null;
             }
+            if (this._previewPlayer) {
+                this._previewPlayer.destroy();
+                this._previewPlayer = null;
+            }
+            this._activePreviewButton = null;
         }
 
         _cancelSearchDebounce() {
@@ -462,6 +567,55 @@ const AddStationsPage = GObject.registerClass(
             }
         }
 
+        _showToast(title, timeout = 3) {
+            const window = this._window || this.get_root();
+            if (window && window.add_toast) {
+                const toast = new Adw.Toast({
+                    title: title,
+                    timeout: timeout,
+                });
+                window.add_toast(toast);
+            }
+        }
+
+        _togglePreview(station, previewButton) {
+            const uuid = station.stationuuid || station.uuid;
+            if (this._previewPlayer.currentUuid === uuid) {
+                this._previewPlayer.stop();
+                return;
+            }
+
+            if (this._activePreviewButton && this._activePreviewButton !== previewButton) {
+                this._activePreviewButton.set_icon_name('media-playback-start-symbolic');
+                this._activePreviewButton.set_tooltip_text(_('Preview station'));
+            }
+
+            this._activePreviewButton = previewButton;
+
+            this._previewPlayer.play(
+                station,
+                (isPlaying) => {
+                    if (isPlaying) {
+                        previewButton.set_icon_name('media-playback-stop-symbolic');
+                        previewButton.set_tooltip_text(_('Stop preview'));
+                    } else {
+                        previewButton.set_icon_name('media-playback-start-symbolic');
+                        previewButton.set_tooltip_text(_('Preview station'));
+                        if (this._activePreviewButton === previewButton)
+                            this._activePreviewButton = null;
+                    }
+                },
+                (errorMessage) => {
+                    previewButton.set_icon_name('media-playback-start-symbolic');
+                    previewButton.set_tooltip_text(_('Preview station'));
+                    if (this._activePreviewButton === previewButton)
+                        this._activePreviewButton = null;
+                    if (errorMessage)
+                        this._showToast(errorMessage);
+                }
+            );
+        }
+
         _populateResults(stations) {
             this._clearResultRows();
 
@@ -474,6 +628,17 @@ const AddStationsPage = GObject.registerClass(
                     subtitle: GLib.markup_escape_text(station.url_resolved || station.url || station.homepage || '', -1),
                     activatable: !isAlreadySaved,
                 });
+
+                const isCurrentPreview = this._previewPlayer?.currentUuid === station.stationuuid;
+                const previewButton = new Gtk.Button({
+                    icon_name: isCurrentPreview ? 'media-playback-stop-symbolic' : 'media-playback-start-symbolic',
+                    tooltip_text: isCurrentPreview ? _('Stop preview') : _('Preview station'),
+                    has_frame: false,
+                });
+                if (isCurrentPreview)
+                    this._activePreviewButton = previewButton;
+
+                previewButton.connect('clicked', () => this._togglePreview(station, previewButton));
 
                 const saveButton = new Gtk.Button({
                     icon_name: isAlreadySaved ? 'user-trash-symbolic' : 'list-add-symbolic',
@@ -491,6 +656,7 @@ const AddStationsPage = GObject.registerClass(
                     rowHandlerId = row.connect('activated', () => this._saveStationFromResult(station));
                 }
 
+                row.add_suffix(previewButton);
                 row.add_suffix(saveButton);
                 row.set_sensitive(true);
                 row.set_activatable(!isAlreadySaved);
@@ -499,6 +665,7 @@ const AddStationsPage = GObject.registerClass(
                 this._resultRowMap.set(station.stationuuid, {
                     row,
                     button: saveButton,
+                    previewButton,
                     station,
                     buttonHandlerId,
                     rowHandlerId
@@ -519,6 +686,9 @@ const AddStationsPage = GObject.registerClass(
         }
 
         _clearResultRows() {
+            if (this._previewPlayer)
+                this._previewPlayer.stop();
+            this._activePreviewButton = null;
             this._resultRows.forEach(row => this._resultsGroup.remove(row));
             this._resultRows = [];
             this._resultRowMap.clear();
@@ -1357,7 +1527,7 @@ export default class YetAnotherRadioPreferences extends ExtensionPreferences {
         const generalSettingsPage = new GeneralSettingsPage(settings, [], refreshCallback, window);
         const savedStationsPage = new SavedStationsPage([], refreshCallback);
         const recordingsPage = new RecordingsPage(settings, window);
-        const addStationsPage = new AddStationsPage([], refreshCallback, settings);
+        const addStationsPage = new AddStationsPage([], refreshCallback, settings, window);
 
         loadStations().then(stations => {
             refreshCallback(stations);
