@@ -20,7 +20,6 @@ export function createStationMenuItem(station, playStationCallback, isNowPlaying
     });
 
     const box = new St.BoxLayout({
-        vertical: false,
         x_expand: true,
         y_align: Clutter.ActorAlign.CENTER,
         style_class: 'yetanotherradio-station-row',
