@@ -95,6 +95,11 @@ preferencespage preferencesgroup actionrow {
     max-height: 20em;
 }
 
+.yetanotherradio-scroll-view .popup-menu-item,
+.yetanotherradio-scroll-view .popup-separator-menu-item {
+    margin-right: 6px;
+}
+
 
 .metadata-controls-box {
     spacing: 8px;

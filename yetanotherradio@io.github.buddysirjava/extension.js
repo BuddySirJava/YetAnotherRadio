@@ -106,7 +106,7 @@ const Indicator = GObject.registerClass(
                     style_class: 'yetanotherradio-scroll-view',
                     hscrollbar_policy: St.PolicyType.NEVER,
                     vscrollbar_policy: St.PolicyType.AUTOMATIC,
-                    overlay_scrollbars: true,
+                    overlay_scrollbars: false,
                 });
                 this._stationScrollView.set_x_expand(true);
                 this._stationScrollView.set_y_expand(true);
