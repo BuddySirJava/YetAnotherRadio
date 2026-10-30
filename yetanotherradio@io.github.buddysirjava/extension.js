@@ -318,13 +318,24 @@ export default class YetAnotherRadioExtension extends Extension {
         this._indicator = new Indicator(
             [],
             () => {
-                this.openPreferences().catch(error => {
+                try {
+                    const res = this.openPreferences();
+                    if (res && typeof res.catch === 'function') {
+                        res.catch(error => {
+                            logError(error, 'Failed to open preferences');
+                            Main.notifyError(
+                                _('Yet Another Radio'),
+                                GLib.markup_escape_text(_('Could not open preferences.'), -1)
+                            );
+                        });
+                    }
+                } catch (error) {
                     logError(error, 'Failed to open preferences');
                     Main.notifyError(
                         _('Yet Another Radio'),
                         GLib.markup_escape_text(_('Could not open preferences.'), -1)
                     );
-                });
+                }
             },
             this.path,
             this._settings,
