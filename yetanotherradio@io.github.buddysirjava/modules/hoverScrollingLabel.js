@@ -90,13 +90,16 @@ export function createHoverScrollingLabel(params = {}) {
         hscrollbar_policy: St.PolicyType.NEVER,
         vscrollbar_policy: St.PolicyType.NEVER,
         enable_mouse_scrolling: false,
-        enable_touch_scrolling: false,
         clip_to_allocation: true,
         reactive: true,
         track_hover: true,
         x_expand: xExpand,
         y_expand: false,
     });
+
+    // gnome 51> doesn't support touch scrolling
+    if (typeof scrollView.set_touch_scrolling === 'function')
+        scrollView.set_touch_scrolling(false);
 
     const innerBox = new St.BoxLayout({
         x_expand: true,
